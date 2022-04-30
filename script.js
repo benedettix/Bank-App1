@@ -6,6 +6,7 @@ let accountEditDelView = document.querySelector('#accountEditDelView');
 let accountEditDelViewBtn = document.querySelector('[href="#accountEditDelView"]');
 let accountEditDelViewTbody = document.querySelector('#accountEditDelView tbody');
 let accountAddViewBtn = document.querySelector('[data-id="save"]');
+let searchInput = document.querySelector('[type="search"]');
 
 
 
@@ -24,31 +25,47 @@ let eaddCard = document.querySelector('#eaddCard')
 
 
 
-
+searchInput.addEventListener('input', searchAccount);
 window.addEventListener("hashchange", changeView);
 accountAddViewBtn.addEventListener("click", saveAccountBtn);
+window.addEventListener('beforeunload', save);
 
 
-createAccountTable();
-function createAccountTable() {
-    let text = [];
-    db.forEach(account => {    
+function save() {
+    return localStorage.accounts = JSON.stringify(db);
+}
 
-        text += `
-        <tr>
-            <th scope="row">${account.id}</th>
-            <td>${account.user}</td>
-            <td>${account.deposit}</td>
-            <td>${account.card}</td>
-            <td>${account.country}</td>
-        </tr>
-        
-        
-        
-        `.trim();
 
-    })
-    accountViewTbody.innerHTML = text;
+  
+
+
+
+createAccountTable(db);
+function createAccountTable(searchedAcc) {
+    if(!searchedAcc) {
+        searchedAcc = db;
+    }
+        let text = [];
+        searchedAcc.forEach(account => {    
+    
+            text += `
+            <tr>
+                <th scope="row">${account.id}</th>
+                <td>${account.user}</td>
+                <td>${account.deposit}</td>
+                <td>${account.card}</td>
+                <td>${account.country}</td>
+            </tr>
+            
+            
+            
+            `.trim();
+    
+        })
+        accountViewTbody.innerHTML = text;
+    
+
+  
     
 }
 
@@ -204,3 +221,12 @@ function eoptionChange(Ecountry) {
     return eaccountCountry.innerHTML = text;
 }
 
+function searchAccount() {
+    let term = this.value;
+    let currentDb = db.filter(el => {
+        return el.user.indexOf(term) !== -1 || el.card.indexOf(term) !== -1 || el.country.indexOf(term) !== -1
+   
+        
+    })
+    createAccountTable(currentDb)
+}
